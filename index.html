@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title data-i18n="app.title">Balls Simulation</title>
+        
+        <!-- Подключение иконки сайта -->
+        <link rel="icon" type="image/png" href="icon.png">
+        <link rel="apple-touch-icon" href="icon.png">
+
+        <style>      
+            body, html {
+                margin: 0;
+                padding: 0;
+                background-color: #050505;
+                color: #fff;
+                font-family: sans-serif;
+                overflow: hidden;
+            }
+
+            canvas {
+                position: absolute;
+                left: 0pt;
+                top: 0pt;
+                background-color: #000;
+            }
+
+            div.panel {
+                position: absolute;
+                left: 0pt;
+                bottom: 0pt;
+                width: 100%;
+                background: rgba(10, 10, 15, 0.85);
+                border-top: 2px solid #0ff;
+                box-shadow: 0 -5px 20px rgba(0, 255, 255, 0.3);
+                padding-top: 10pt;
+                padding-bottom: 10pt;
+                font-size: 12pt;
+                white-space: nowrap;
+                overflow-x: auto;
+            }
+
+            span {
+                color: #0ff;
+                text-shadow: 0 0 8px #0ff;
+            }
+
+            td {
+                color: #fff;
+            }
+
+            .slider {
+                width: 200pt;
+                accent-color: #f0f;
+            }
+
+            input[type="button"] {
+                background: #111;
+                color: #f0f;
+                border: 1px solid #f0f;
+                box-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+                border-radius: 4px;
+                padding: 4px 10px;
+                margin: 2px;
+                cursor: pointer;
+                font-weight: bold;
+                transition: 0.2s;
+            }
+
+            input[type="button"]:hover {
+                background: #f0f;
+                color: #000;
+                box-shadow: 0 0 15px #f0f;
+            }
+
+            input[type="button"].active {
+                background: #ff0055;
+                color: #fff;
+                border-color: #ff0055;
+                box-shadow: 0 0 15px #ff0055;
+            }
+
+            input[type="button"].active-vortex {
+                background: #b000ff;
+                color: #fff;
+                border-color: #b000ff;
+                box-shadow: 0 0 15px #b000ff;
+            }
+
+            .footer {
+                position: absolute;
+                right: 5px;
+                bottom: 5px;
+                color: #555;
+                font-size: 9pt;
+            }
+
+            .footer a {
+                color: #0ff;
+                text-shadow: 0 0 5px #0ff;
+                text-decoration: none;
+            }
+
+            .languageSelect {
+                font-size: 9pt;
+                color: #0ff;
+                background: #111;
+                border: 1px solid #0ff;
+                border-radius: 3px;
+                margin-left: 8px;
+                padding: 2px;
+            }
+        </style>
+        <script src="main.js"></script>
+        <script src="RenderScene.js"></script>
+    </head>
+    <body>
+        <canvas id="canvas"></canvas>
+        <div class="panel" id="panel">
+            <center>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><span data-i18n="controls.radius">Radius:</span></td>
+                            <td>1</td>
+                            <td><input id="Slider1" class="slider" type="range" min=1 max=100 step=1 value=39></td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td><span data-i18n="controls.wallElasticity">Wall elasticity:</span></td>
+                            <td>0</td>
+                            <td><input id="Slider2" class="slider" type="range" min=0 max=1 step=0.00001 value=0.95></td>
+                            <td>1</td>
+                        </tr>
+                        <tr>
+                            <td><span data-i18n="controls.airResistance">Air resistance:</span></td>
+                            <td>0</td>
+                            <td><input id="Slider4" class="slider" type="range" min=0 max=0.01 step=0.00001 value=0></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span data-i18n="controls.gravity">Gravity:</span></td>
+                            <td>0</td>
+                            <td><input id="Slider3" class="slider" type="range" min=0 max=10 step=0.00001 value=3></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td><span data-i18n="controls.glow">Glow:</span></td>
+                            <td>0</td>
+                            <td><input id="SliderGlow" class="slider" type="range" min=0 max=40 step=1 value=15></td>
+                            <td>40</td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <input type="button" id="stepperUp" value="+">
+                                <input type="button" id="stepperDown" value="-">
+                                <label><input id="segment1" name="segmented" type="radio" checked><span data-i18n="modes.free">Free</span></label>
+                                <label><input id="segment2" name="segmented" type="radio"><span data-i18n="modes.fixed">Fixed</span></label>
+                                <label><input id="segment3" name="segmented" type="radio"><span data-i18n="modes.connected">Connected</span></label>
+                                <label><input id="segment4" name="segmented" type="radio"><span data-i18n="modes.spring">Spring</span></label>
+                                <br>
+                                <label><input id="switch1" type="checkbox"><span data-i18n="controls.clickDrag">Click/Drag to add balls</span></label>
+                                <label style="margin-left:12px;"><input id="switchRGB" type="checkbox"><span data-i18n="controls.rgbMode">RGB Mode</span></label>
+                                <br>
+                                <input type="button" id="btnPencil" value="✏️ Блоки" data-i18n-value="controls.pencil">
+                                <input type="button" id="btnVortex" value="🌀 Чёрная дыра" data-i18n-value="controls.vortex">
+                                <input type="button" id="btnClearBlocks" value="🧹 Очистить блоки" data-i18n-value="controls.clearBlocks">
+                                <input type="button" id="btnClearVortexes" value="🧹 Очистить дыры" data-i18n-value="controls.clearVortexes">
+                                <input type="button" id="btnRestart" value="Remove All" data-i18n-value="controls.removeAll">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </center>
+        </div>
+    
+        <div class="footer">
+            <a href="https://github.com/ricktu288/balls-simulation" target="_blank" data-i18n="links.githubRepo">GitHub Repo</a>
+            <select id="languageSelect" class="languageSelect" data-i18n-aria-label="language.label">
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+                <option value="zh-TW">正體中文</option>
+                <option value="zh-CN">简体中文</option>
+            </select>
+        </div>
+    </body>
+</html>
